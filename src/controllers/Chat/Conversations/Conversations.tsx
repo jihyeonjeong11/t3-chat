@@ -1,30 +1,32 @@
 import { IoAddOutline, IoChevronBack } from "react-icons/io5";
 import IconButton from "../../../components/IconButton/IconButton";
-
+import type { User } from "../Chat";
 // dummy conversation data
 const conversations = [
   {
-    userId: 1,
+    userId: "1",
     conversation: {
-      id: 2,
+      id: "2",
       conversationUsers: [
         {
-          id: 1,
+          id: "1",
           name: "me",
           image:
             "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/712.jpg",
+          username: "me",
         },
         {
-          id: 3,
+          id: "3",
           name: "John Rumi",
           image:
             "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/712.jpg",
+          username: "jrumi",
         },
       ],
     },
     messages: [
       {
-        id: 4,
+        id: "4",
         messageText: "this is a Message.",
       },
     ],
@@ -44,7 +46,14 @@ const conversations = [
 //userId
 //conversationId
 
-export default function Conversations() {
+interface Props {
+  selectConversation: (
+    currentConversationId: string,
+    currentRecipient: User | null
+  ) => void;
+}
+
+export default function Conversations({ selectConversation }: Props) {
   return (
     <div className="fixed top-0 bottom-0 left-0 right-0 flex flex-col space-y-5 bg-level1 p-5 md:bottom-[unset] md:left-[unset] md:top-[76px] md:right-4 md:h-[540px] md:w-96 md:space-y-5 md:rounded-xl md:shadow-sm">
       <div className="flex items-center justify-between">
@@ -52,14 +61,14 @@ export default function Conversations() {
           <IoChevronBack />
         </IconButton>
         <p className="text-lg">Messages</p>
-        <IconButton>
+        <IconButton onClick={() => selectConversation("newMessage", null)}>
           <IoAddOutline />
         </IconButton>
       </div>
       <ul>
         {conversations.map((conversationInfo) => {
           const recipient =
-            conversationInfo.conversation.conversationUsers[0].id ===
+            conversationInfo.conversation.conversationUsers[0]!.id ===
             conversationInfo.userId
               ? conversationInfo.conversation.conversationUsers[1]
               : conversationInfo.conversation.conversationUsers[0];
@@ -68,7 +77,15 @@ export default function Conversations() {
               key={conversationInfo.userId + "conversation"}
               className="rounded-lg py-2 hover:bg-level1Hover"
             >
-              <button className="space-x mx-2 flex items-center space-x-2 text-left">
+              <button
+                className="space-x mx-2 flex items-center space-x-2 text-left"
+                onClick={() =>
+                  selectConversation(
+                    conversationInfo.conversation.id,
+                    recipient!
+                  )
+                }
+              >
                 <img
                   src={recipient!.image}
                   alt="avartar image"
