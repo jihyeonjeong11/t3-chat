@@ -76,4 +76,24 @@ this actually has example for trpc 10 chat connection code.
 (don;t know if this one using websocket or not but not using agora so...)
 
 since I changed pirating target, i just replace old one to this project with t3 nextauth.
+
+But I will return old one after this one, to write websocket chat feature.
 12/21
+
+12/25
+check that IconButton.tsx's type DetailedHTMLProps
+
+[&-svg]:h-6 usage too.
+
+https://playcode.io/1044775
+I faked image file with faker-js/faker check that.
+
+this is what youtuber prefers:
+
+anything that can be reusable use components folder
+
+else all goes to controllers
+
+https://norwayy.tistory.com/366
+
+check Conversations non-null assertion code. We can use this since we are using dummy data here.
