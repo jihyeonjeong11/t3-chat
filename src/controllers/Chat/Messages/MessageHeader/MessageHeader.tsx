@@ -12,11 +12,11 @@ export default function MessageHeader({
   currentRecipient,
 }: Props) {
   return (
-    <div className="flex justify-between ">
+    <div className="flex items-center justify-between">
       {!currentRecipient ? (
-        <p className="text-lg">New Message</p>
+        <p>New Message</p>
       ) : (
-        <div className="flex">
+        <div className="flex items-center">
           <img
             className="mr-2 h-11 w-11 rounded-full"
             src={currentRecipient.image}
@@ -30,7 +30,7 @@ export default function MessageHeader({
           </div>
         </div>
       )}
-      <div className="flex">
+      <div className="flex items-center">
         {currentRecipient && (
           <IconButton>
             <IoRemoveOutline />
