@@ -66,11 +66,11 @@ export default function NewConversationUserInput({
         <ul className="absolute left-0 right-0 top-[calc(100%+12px)] rounded-lg bg-level2">
           {searchResults.map((userEntry) => (
             <li
-              className="flex p-3 first:rounded-t-lg last:rounded-b-lg hover:bg-level2Hover"
+              className="first:rounded-t-lg last:rounded-b-lg hover:bg-level2Hover"
               key={userEntry.name}
             >
               <button
-                className="flex text-left"
+                className="mx-2 flex w-full items-center space-x-2 p-3 py-2 text-left"
                 onClick={() => setCurrentRecipient(userEntry)}
               >
                 <img

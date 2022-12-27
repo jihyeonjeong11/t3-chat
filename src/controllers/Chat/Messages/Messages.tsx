@@ -1,5 +1,6 @@
 import { ChatState } from "../Chat";
 import MessageHeader from "./MessageHeader/MessageHeader";
+import MessageSection from "./MessageSection/MessageSection";
 import NewConversationUserInput from "./NewConversationUserInput/NewConversationUserInput";
 
 type Props = Omit<ChatState, "setCurrentConversationId">;
@@ -14,6 +15,7 @@ export default function Messages({
       {currentRecipient === null && (
         <NewConversationUserInput setCurrentRecipient={setCurrentRecipient} />
       )}
+      <MessageSection currentRecipient={currentRecipient} />
     </div>
   );
 }
