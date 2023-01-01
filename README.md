@@ -97,3 +97,23 @@ else all goes to controllers
 https://norwayy.tistory.com/366
 
 check Conversations non-null assertion code. We can use this since we are using dummy data here.
+
+12/31
+
+install brew postgresql
+brew services start postgresql
+
+DATABASE_URL=postgresql://jihyeonjeong:postgres@localhost:5432/t1_chatapp
+
+psql postgres
+
+CREATE DATABASE t1_chatapp;
+
+//DATABASE_URL=postgresql://jihyeonjeong:postgres@localhost:5432/t1_chatapp
+
+// needed to change url from .env to this. jihyeonjeong is my username
+// https://github.com/remix-run/blues-stack/issues/49
+
+// \c t1_chatapp
+// \d+ to see all tables
+// \d+ "User"
