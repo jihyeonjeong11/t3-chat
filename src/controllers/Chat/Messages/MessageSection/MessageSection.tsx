@@ -3,7 +3,7 @@ import { ChatState } from "../../Chat";
 const messages = [
   {
     id: "1",
-    messageText: "Hi, good afternoon. This is a Message.",
+    messageText: "Hi, good afternoon. \r\n This is a Message.",
     userId: "3",
     createdAt: new Date(),
   },
@@ -37,7 +37,7 @@ export default function MessageSection({ currentRecipient }: Props) {
   };
 
   return (
-    <ul className="flex h-full flex-col space-y-5">
+    <ul className="flex h-full flex-col space-y-5 overflow-y-scroll">
       {messages.map((message, index) => {
         const timestamp = getTimeStamp(messages, index);
         return (
@@ -55,7 +55,7 @@ export default function MessageSection({ currentRecipient }: Props) {
                   className="mr-2 h-7 w-7 self-end rounded-full"
                 />
                 <div className="flex flex-col space-y-3 rounded-xl bg-level2 p-2">
-                  <p>{message.messageText}</p>
+                  <p className="whitespace-pre-line">{message.messageText}</p>
                   <p className="self-end text-xs text-tertiaryText">
                     {new Intl.DateTimeFormat([], {
                       hour: "numeric",

@@ -1,15 +1,19 @@
 import { IoCloseOutline, IoRemoveOutline } from "react-icons/io5";
 import IconButton from "../../../../components/IconButton/IconButton";
 import type { ChatState } from "../../Chat";
+import { MessagesState } from "../Messages";
 
 type Props = Omit<
   ChatState,
   "setCurrentConversationId" | "setCurrentRecipient" | "currentConversationId"
->;
+> &
+  MessagesState;
 
 export default function MessageHeader({
   currentConversationId,
   currentRecipient,
+  closeMessages,
+  addToConvoQueue,
 }: Props) {
   return (
     <div className="flex items-center justify-between">
@@ -32,11 +36,15 @@ export default function MessageHeader({
       )}
       <div className="flex items-center">
         {currentRecipient && (
-          <IconButton>
+          <IconButton
+            onClick={() =>
+              addToConvoQueue(currentConversationId!, currentRecipient)
+            }
+          >
             <IoRemoveOutline />
           </IconButton>
         )}
-        <IconButton>
+        <IconButton onClick={closeMessages}>
           <IoCloseOutline />
         </IconButton>
       </div>

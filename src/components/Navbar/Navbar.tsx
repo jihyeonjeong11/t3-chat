@@ -4,21 +4,13 @@ import { useState } from "react";
 import Chat from "../../controllers/Chat/Chat";
 
 export default function Navbar() {
-  const [showChat, setShowChat] = useState(false);
   return (
     <nav className="fixed top-0 z-50 flex h-14 w-full items-center justify-end space-x-2 bg-level1 px-4 shadow-sm">
       <IconButton>
         <IoMoonOutline />
       </IconButton>
       <div>
-        <IconButton
-          onClick={() => setShowChat((chat) => !chat)}
-          shouldFill={showChat}
-        >
-          <IoChatboxOutline />
-        </IconButton>
-
-        {showChat && <Chat />}
+        <Chat />
       </div>
       <div className="flex h-10 w-10 items-center justify-center">
         <img
