@@ -99,7 +99,73 @@ export const chatRouter = router({
         userId: z.string().nullish(),
       })
     )
-    .mutation(({ input: { messageText, conversationId, userId }, ctx }) => {
-      return;
-    }),
+    .mutation(
+      async ({ input: { messageText, conversationId, userId }, ctx }) => {
+        if (!conversationId) {
+          if (!userId) {
+            throw new Error("No recipient passes");
+          }
+          // transaction ? two db updates at one api
+          return ctx.prisma.$transaction(async (trx) => {
+            const conversation = await trx.conversation.create({
+              data: {
+                messages: {
+                  create: {
+                    messageText,
+                    userId: ctx.session.user.id,
+                  },
+                },
+                conversationUsers: {
+                  createMany: {
+                    data: [{ userId }, { userId: ctx.session.user.id }],
+                  },
+                },
+              },
+              include: {
+                messages: true,
+              },
+            });
+            trx.conversation.update({
+              data: {
+                lastMessageId: conversation.messages[0]!.id,
+              },
+              where: {
+                id: conversation.id,
+              },
+            });
+
+            await ctx.prisma.$transaction(async (trx) => {
+              const [message] = await Promise.all([
+                trx.message.create({
+                  data: {
+                    messageText,
+                    userId: ctx.session.user.id,
+                    conversationId,
+                  },
+                }),
+                trx.conversationUser.findUniqueOrThrow({
+                  where: {
+                    userId_conversationId: {
+                      userId: ctx.session.user.id,
+                      conversationId,
+                    },
+                  },
+                }),
+              ]);
+
+              await trx.conversation.update({
+                data: {
+                  lastMessageId: message.id,
+                },
+                where: {
+                  id: conversation.id,
+                },
+              });
+            });
+
+            // we want to return conversation itself
+          });
+        }
+      }
+    ),
 });
