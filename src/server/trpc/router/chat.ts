@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { observable } from "@trpc/server/observable";
 
 export const chatRouter = router({
   hello: publicProcedure
@@ -128,7 +129,7 @@ export const chatRouter = router({
 
           return ctx.prisma.$transaction(async (trx) => {
             const conversation = await trx.conversation.create({
-              // 1. if conversationId passed, creates new Message row in conversation
+              // 1. if conversationId not passed, creates new Message row and new conversation
               data: {
                 messages: {
                   create: {
@@ -155,11 +156,17 @@ export const chatRouter = router({
                 id: conversation.id,
               },
             });
+            ctx.ee.emit("sendMessage", {
+              conversationId: conversation.id,
+              userId,
+            });
+            return conversation;
           });
         }
         //
         await ctx.prisma.$transaction(async (trx) => {
-          // if no conversationId, that means we need new conversation with new message and conversationuser
+          // if conversationId passed,
+          // that means we already have conversation and conversationUsers
           //
           const [message] = await Promise.all([
             trx.message.create({
@@ -190,7 +197,41 @@ export const chatRouter = router({
           });
         });
 
-        // we want to return conversation itself
+        // if conversationId passed (case 2 outside of if block)
+        // we need to find user after we create conversation record.
+        // because we don't create new conversationUser hence it already exists.
+        const user = await ctx.prisma.conversationUser.findFirst({
+          where: {
+            conversationId,
+            NOT: {
+              userId: ctx.session.user.id,
+            },
+          },
+          select: {
+            userId: true,
+          },
+        });
+
+        ctx.ee.emit("sendMessage", { conversationId, userId: user!.userId });
+        // finally we call onSendMessage callback
       }
     ),
+  onSendMessage: protectedProcedure.subscription(({ ctx }) => {
+    return observable<{ conversationId: string }>((emit) => {
+      // server subscripts db changes and returns conversationId
+      const onSendMessage = (data: {
+        conversationId: string;
+        userId: string;
+      }) => {
+        if (data.userId === ctx.session.user.id) {
+          // if same user id
+          emit.next({ conversationId: data.conversationId }); // event Emitter pass conversationId
+        }
+      };
+      ctx.ee.on("sendMessage", onSendMessage); // when sendMessage event happens, trigger onSendMessageCallback
+      return () => {
+        ctx.ee.on("sendMessage", onSendMessage);
+      };
+    });
+  }),
 });

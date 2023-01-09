@@ -117,3 +117,11 @@ CREATE DATABASE t1_chatapp;
 // \c t1_chatapp
 // \d+ to see all tables
 // \d+ "User"
+
+01/09
+
+see wsServer.ts.
+
+we added node-fetch@2 because https://github.com/trpc/examples-next-prisma-websockets-starter/blob/main/package.json
+
+trpc docs said so.

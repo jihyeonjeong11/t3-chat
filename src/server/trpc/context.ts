@@ -2,8 +2,12 @@ import { type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
-import { getServerAuthSession } from "../common/get-server-auth-session";
 import { prisma } from "../db/client";
+import type { IncomingMessage } from "http";
+import type { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
+import { getSession } from "next-auth/react";
+import type ws from "ws";
+import { ee } from "../wsServer/eventEmitter";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -18,6 +22,7 @@ export const createContextInner = async (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    ee,
   };
 };
 
@@ -25,11 +30,21 @@ export const createContextInner = async (opts: CreateContextOptions) => {
  * This is the actual context you'll use in your router
  * @link https://trpc.io/docs/context
  **/
-export const createContext = async (opts: CreateNextContextOptions) => {
+export const createContext = async (
+  opts:
+    | CreateNextContextOptions
+    | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>
+) => {
   const { req, res } = opts;
 
   // Get the session from the server using the unstable_getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
+  // check url below:
+  // https://next-auth.js.org/configuration/nextjs#unstable_getserversession
+  // in serverside, use unstable_getServerSession to reduce extra fetch to an API Route.
+  //but it's still experimental so in this proj we gonna use getSession and add extra api to out route.
+
+  //const session = await unstable_getServerSession();
+  const session = await getSession({ req });
 
   return await createContextInner({
     session,

@@ -91,7 +91,7 @@ export default function MessageTextArea({
         className="h-10 max-h-36 w-full resize-none bg-level2 py-2 px-3 outline-none placeholder:text-quaternaryText"
       />
       {message !== "" && (
-        <IconButton>
+        <IconButton onClick={sendMessage}>
           <IoSend />
         </IconButton>
       )}

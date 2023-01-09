@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import IconButton from "../../components/IconButton/IconButton";
 import { IoChatboxOutline } from "react-icons/io5";
 import type { User } from "@prisma/client";
+import { trpc } from "../../utils/trpc";
 
 // export interface User {
 //   id: string;
@@ -23,6 +24,13 @@ export interface ChatState {
 }
 
 export default function Chat() {
+  const utils = trpc.useContext();
+  trpc.chat.onSendMessage.useSubscription(undefined, {
+    onData: ({ conversationId }) => {
+      utils.chat.conversations.invalidate();
+      utils.chat.messages.invalidate({ conversationId });
+    },
+  });
   const [showConversations, setShowConversations] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<
     string | null
