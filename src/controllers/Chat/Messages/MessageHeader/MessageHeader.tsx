@@ -5,7 +5,7 @@ import { MessagesState } from "../Messages";
 
 type Props = Omit<
   ChatState,
-  "setCurrentConversationId" | "setCurrentRecipient" | "currentConversationId"
+  "setCurrentConversationId" | "setCurrentRecipient"
 > &
   MessagesState;
 
@@ -23,7 +23,7 @@ export default function MessageHeader({
         <div className="flex items-center">
           <img
             className="mr-2 h-11 w-11 rounded-full"
-            src={currentRecipient.image}
+            src={currentRecipient.image || ""}
             alt="avatar profile image"
           />
           <div className="flex flex-col">

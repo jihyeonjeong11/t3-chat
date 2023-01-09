@@ -2,14 +2,59 @@ import { IoSend } from "react-icons/io5";
 import IconButton from "../../../components/IconButton/IconButton";
 import useOnChange from "../../../hooks/useOnChange";
 import { useEffect, useRef } from "react";
+import { trpc } from "../../../utils/trpc";
+import type { ChatState } from "../Chat";
 
-export default function MessageTextArea() {
+type Props = Pick<
+  ChatState,
+  "currentConversationId" | "currentRecipient" | "setCurrentConversationId"
+>;
+
+export default function MessageTextArea({
+  currentConversationId,
+  currentRecipient,
+  setCurrentConversationId,
+}: Props) {
   const {
     values: { message },
     setValues,
     handleChange,
   } = useOnChange({ message: "" });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const utils = trpc.useContext();
+  const sendMessageMutation = trpc.chat.sendMessage.useMutation();
+
+  const sendMessage = () => {
+    if (message) {
+      sendMessageMutation.mutate(
+        {
+          messageText: message,
+          ...(currentConversationId === "newMessage"
+            ? { userId: currentRecipient!.id }
+            : { conversationId: currentConversationId }),
+        },
+        {
+          onSettled: (data: any, error) => {
+            if (currentConversationId !== "newMessage") {
+              utils.chat.conversations.invalidate(); // to get latest
+              utils.chat.messages.invalidate({
+                conversationId: currentConversationId!,
+              });
+            }
+            if (data) {
+              setCurrentConversationId(data.id);
+            }
+            if (error) {
+              alert(error.message);
+            }
+            setValues({ message: "" });
+          },
+        }
+      );
+    }
+    setValues({ messages: "" });
+  };
 
   const resizeTextArea = () => {
     if (textAreaRef.current) {
@@ -22,7 +67,7 @@ export default function MessageTextArea() {
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" && !event.altKey && !event.shiftKey) {
       event.preventDefault();
-      // sendMessage();
+      sendMessage();
     }
     if (event.key === "Enter" && event.altKey) {
       event.preventDefault();

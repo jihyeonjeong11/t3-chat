@@ -4,19 +4,22 @@ import Messages from "./Messages/Messages";
 import type { Dispatch, SetStateAction } from "react";
 import IconButton from "../../components/IconButton/IconButton";
 import { IoChatboxOutline } from "react-icons/io5";
+import type { User } from "@prisma/client";
 
-export interface User {
-  id: string;
-  username: string;
-  image: string;
-  name: string;
-}
+// export interface User {
+//   id: string;
+//   username: string;
+//   image: string;
+//   name: string;
+// }
+
+type PartialUser = Partial<User>;
 
 export interface ChatState {
   currentConversationId: string | null;
-  currentRecipient: User | null;
+  currentRecipient: PartialUser | null;
   setCurrentConversationId: Dispatch<SetStateAction<string | null>>;
-  setCurrentRecipient: Dispatch<SetStateAction<User | null>>;
+  setCurrentRecipient: Dispatch<SetStateAction<PartialUser | null>>;
 }
 
 export default function Chat() {
@@ -24,21 +27,23 @@ export default function Chat() {
   const [currentConversationId, setCurrentConversationId] = useState<
     string | null
   >(null);
-  const [currentRecipient, setCurrentRecipient] = useState<User | null>(null);
+  const [currentRecipient, setCurrentRecipient] = useState<PartialUser | null>(
+    null
+  );
   const [conversationQueue, setConversationQueue] = useState<
-    { conversationId: string; recipient: User }[]
+    { conversationId: string; recipient: PartialUser }[]
   >([]);
 
   const selectConversation = (
     currentConversationId: string,
-    recipient: User | null
+    recipient: PartialUser | null
   ) => {
     setCurrentConversationId(currentConversationId);
     setCurrentRecipient(recipient);
     setShowConversations(false);
   };
 
-  const addToConvoQueue = (conversationId: string, recipient: User) => {
+  const addToConvoQueue = (conversationId: string, recipient: PartialUser) => {
     setConversationQueue((queue) => [{ conversationId, recipient }, ...queue]);
     closeMessages();
   };
@@ -67,6 +72,7 @@ export default function Chat() {
       )}
       {currentConversationId && (
         <Messages
+          setCurrentConversationId={setCurrentConversationId}
           currentRecipient={currentRecipient}
           currentConversationId={currentConversationId}
           setCurrentRecipient={setCurrentRecipient}
@@ -88,7 +94,7 @@ export default function Chat() {
                   }}
                 >
                   <img
-                    src={convoEntry.recipient.image}
+                    src={convoEntry.recipient.image || ""}
                     alt="avatar profile image"
                     className="h-12 w-12 rounded-full"
                   />

@@ -1,4 +1,4 @@
-import { string, z } from "zod";
+import { z } from "zod";
 
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 
@@ -91,6 +91,22 @@ export const chatRouter = router({
         },
       });
     }),
+  changeUserTheme: protectedProcedure
+    .input(z.object({ theme: z.enum(["light", "dark"]) }))
+    .mutation(({ input: { theme }, ctx }) => {
+      return ctx.prisma.user.update({
+        data: {
+          theme,
+        },
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          id: true,
+          theme: true,
+        },
+      });
+    }),
   sendMessage: protectedProcedure
     .input(
       z.object({
@@ -101,13 +117,18 @@ export const chatRouter = router({
     )
     .mutation(
       async ({ input: { messageText, conversationId, userId }, ctx }) => {
+        // messageText: chatting content
+        // conversationId: conversation record id
+        // userId: user Id
+        // ctx: ctx.session.userId logon userid
         if (!conversationId) {
           if (!userId) {
             throw new Error("No recipient passes");
           }
-          // transaction ? two db updates at one api
+
           return ctx.prisma.$transaction(async (trx) => {
             const conversation = await trx.conversation.create({
+              // 1. if conversationId passed, creates new Message row in conversation
               data: {
                 messages: {
                   create: {
@@ -126,6 +147,7 @@ export const chatRouter = router({
               },
             });
             trx.conversation.update({
+              // updates conversation record with the new message id as the lastMessageId
               data: {
                 lastMessageId: conversation.messages[0]!.id,
               },
@@ -133,39 +155,42 @@ export const chatRouter = router({
                 id: conversation.id,
               },
             });
-
-            await ctx.prisma.$transaction(async (trx) => {
-              const [message] = await Promise.all([
-                trx.message.create({
-                  data: {
-                    messageText,
-                    userId: ctx.session.user.id,
-                    conversationId,
-                  },
-                }),
-                trx.conversationUser.findUniqueOrThrow({
-                  where: {
-                    userId_conversationId: {
-                      userId: ctx.session.user.id,
-                      conversationId,
-                    },
-                  },
-                }),
-              ]);
-
-              await trx.conversation.update({
-                data: {
-                  lastMessageId: message.id,
-                },
-                where: {
-                  id: conversation.id,
-                },
-              });
-            });
-
-            // we want to return conversation itself
           });
         }
+        //
+        await ctx.prisma.$transaction(async (trx) => {
+          // if no conversationId, that means we need new conversation with new message and conversationuser
+          //
+          const [message] = await Promise.all([
+            trx.message.create({
+              data: {
+                messageText,
+                userId: ctx.session.user.id,
+                conversationId,
+              },
+            }),
+            trx.conversationUser.findUniqueOrThrow({
+              where: {
+                userId_conversationId: {
+                  userId: ctx.session.user.id,
+                  conversationId,
+                },
+              },
+            }),
+          ]);
+
+          await trx.conversation.update({
+            // and update new message id as lastMessageId
+            data: {
+              lastMessageId: message.id,
+            },
+            where: {
+              id: conversationId,
+            },
+          });
+        });
+
+        // we want to return conversation itself
       }
     ),
 });
