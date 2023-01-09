@@ -29,6 +29,9 @@ export default function Chat() {
     onData: ({ conversationId }) => {
       utils.chat.conversations.invalidate();
       utils.chat.messages.invalidate({ conversationId });
+      if (!showConversations && currentConversationId !== conversationId) {
+        setShowNotificationBadge(true);
+      }
     },
   });
   const [showConversations, setShowConversations] = useState(false);
@@ -41,6 +44,7 @@ export default function Chat() {
   const [conversationQueue, setConversationQueue] = useState<
     { conversationId: string; recipient: PartialUser }[]
   >([]);
+  const [showNotificationBadge, setShowNotificationBadge] = useState(false);
 
   const selectConversation = (
     currentConversationId: string,
@@ -49,6 +53,7 @@ export default function Chat() {
     setCurrentConversationId(currentConversationId);
     setCurrentRecipient(recipient);
     setShowConversations(false);
+    removeFromConvoQueue(currentConversationId);
   };
 
   const addToConvoQueue = (conversationId: string, recipient: PartialUser) => {
@@ -68,15 +73,26 @@ export default function Chat() {
   };
 
   return (
-    <div>
+    <div className="relative">
       <IconButton
-        onClick={() => setShowConversations((conversations) => !conversations)}
+        onClick={() => {
+          setShowConversations((conversations) => !conversations);
+          if (showNotificationBadge) {
+            setShowNotificationBadge(false);
+          }
+        }}
         shouldFill={showConversations}
       >
         <IoChatboxOutline />
       </IconButton>
+      {showNotificationBadge && (
+        <div className="absolute right-[6px] top-[6px] h-2 w-2 animate-pulse rounded-full bg-red-600" />
+      )}
       {showConversations && (
-        <Conversations selectConversation={selectConversation} />
+        <Conversations
+          selectConversation={selectConversation}
+          setShowConversations={setShowConversations}
+        />
       )}
       {currentConversationId && (
         <Messages

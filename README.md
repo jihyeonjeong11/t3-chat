@@ -125,3 +125,7 @@ see wsServer.ts.
 we added node-fetch@2 because https://github.com/trpc/examples-next-prisma-websockets-starter/blob/main/package.json
 
 trpc docs said so.
+
+01/09
+
+next-themes for dark theme logic.

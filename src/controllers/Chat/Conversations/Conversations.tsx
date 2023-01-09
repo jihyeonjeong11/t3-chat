@@ -52,6 +52,7 @@ interface Props {
     currentConversationId: string,
     currentRecipient: Partial<User> | null
   ) => void;
+  setShowConversations: (bool: boolean) => void;
 }
 
 const styles = {
@@ -59,7 +60,10 @@ const styles = {
     "fixed top-0 bottom-0 left-0 right-0 flex flex-col space-y-5 bg-level1 p-5 md:bottom-[unset] md:left-[unset] md:top-[76px] md:right-4 md:h-[540px] md:w-96 md:rounded-xl md:shadow-sm",
 };
 
-export default function Conversations({ selectConversation }: Props) {
+export default function Conversations({
+  selectConversation,
+  setShowConversations,
+}: Props) {
   const {
     data: conversations,
     isLoading,
@@ -76,7 +80,10 @@ export default function Conversations({ selectConversation }: Props) {
   return (
     <div className={styles.wrapper}>
       <div className="flex items-center justify-between">
-        <IconButton className="md:hidden">
+        <IconButton
+          className="md:hidden"
+          onClick={() => setShowConversations(false)}
+        >
           <IoChevronBack />
         </IconButton>
         <p className="text-lg">Messages</p>
@@ -113,6 +120,10 @@ export default function Conversations({ selectConversation }: Props) {
                 <div className="flex flex-col space-y-2">
                   <p>{recipient!.name}</p>
                   <p className="text-sm text-tertiaryText">
+                    {conversationInfo.conversation.lastMessage!.userId !==
+                    recipient!.id
+                      ? "You: "
+                      : ""}
                     {conversationInfo.conversation.lastMessage?.messageText}
                   </p>
                 </div>

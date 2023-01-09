@@ -34,6 +34,22 @@ export const userRouter = router({
         },
       });
     }),
+  changeUserTheme: protectedProcedure
+    .input(z.object({ theme: z.enum(["light", "dark"]) }))
+    .mutation(({ input: { theme }, ctx }) => {
+      return ctx.prisma.user.update({
+        data: {
+          theme,
+        },
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          id: true,
+          theme: true,
+        },
+      });
+    }),
   users: protectedProcedure
     .input(z.object({ user: z.string() }))
     .query(({ input: { user }, ctx }) => {
