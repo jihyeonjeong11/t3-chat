@@ -120,7 +120,7 @@ export default function Conversations({
                 <div className="flex flex-col space-y-2">
                   <p>{recipient!.name}</p>
                   <p className="text-sm text-tertiaryText">
-                    {conversationInfo.conversation.lastMessage!.userId !==
+                    {conversationInfo.conversation.lastMessage?.userId !==
                     recipient!.id
                       ? "You: "
                       : ""}

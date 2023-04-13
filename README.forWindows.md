@@ -27,8 +27,6 @@
 
  ALTER USER postgres WITH PASSWORD '123';
 
-
-
 그리고 .env.example을 만들어 값을 넣어줍니다.
 
 중요한것은 DATABASE_URL입니다.
@@ -42,3 +40,5 @@ postgresql://${유저이름}:${비번}@localhost:5432/{기본 db 이름입니다
  해서 완성된 값은 다음과 같습니다.
 
 그리고 npx prisma db push 하면 프리즈마에 지정된 스키마가 psql에 등록되고, yarn dev로 실행가능합니다.
+
+다음에는 이메일 계정을 
