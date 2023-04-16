@@ -13,5 +13,8 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: ["c4-na.altogic.com"],
+  },
 };
 export default config;

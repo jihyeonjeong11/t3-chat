@@ -5,8 +5,10 @@ import { signIn, useSession } from "next-auth/react";
 import { trpc } from "../../utils/trpc";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
+import { env } from "../../env/client.mjs";
 
 export default function Navbar() {
+  console.log(env);
   const { theme, setTheme } = useTheme();
   const { data: sessionData } = useSession();
   const changeUserThemeMutation = trpc.user.changeUserTheme.useMutation();

@@ -129,3 +129,11 @@ trpc docs said so.
 01/09
 
 next-themes for dark theme logic.
+
+04/16
+
+trying altogic email authentication test
+
+https://dev.to/altogic/complete-email-authentication-with-nextjs-and-altogic-1h1i
+
+new dependencies: altogic cookies-next

@@ -5,7 +5,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db/client";
-import Email from "next-auth/providers/email";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   // Include user.id on session
@@ -26,15 +26,22 @@ export const authOptions: NextAuthOptions = {
     //   clientId: env.DISCORD_CLIENT_ID,
     //   clientSecret: env.DISCORD_CLIENT_SECRET,
     // }),
-    Email({
-      server: env.EMAIL_SERVER,
-      from: env.EMAIL_FROM,
+
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
 
     // we also need email secret. find NextAuth docs for more info
     // ...add more providers here
   ],
-  secret: env.NEXTAUTH_SECRET,
 };
 
 export default NextAuth(authOptions);
