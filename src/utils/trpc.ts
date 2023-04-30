@@ -10,10 +10,17 @@ import superjson from "superjson";
 
 import { type AppRouter } from "../server/trpc/router/_app";
 import { NextPageContext } from "next";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
+const { APP_URL, WS_URL } = publicRuntimeConfig;
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+  return APP_URL;
+  if (process.env.NODE_ENV === "production")
+    return `https://${process.env.FLY_URL}`; // SSR should use vercel url
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
@@ -34,7 +41,7 @@ function getEndingLink(ctx: NextPageContext | undefined) {
     });
   }
   const client = createWSClient({
-    url: "ws://localhost:3001",
+    url: WS_URL,
   });
   return wsLink<AppRouter>({
     client,

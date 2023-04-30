@@ -65,6 +65,8 @@ export default function Navbar() {
       ) : (
         <button onClick={() => signIn()}>sign in</button>
       )}
+
+      {process.env.NODE_ENV}
     </nav>
   );
 }

@@ -137,3 +137,21 @@ trying altogic email authentication test
 https://dev.to/altogic/complete-email-authentication-with-nextjs-and-altogic-1h1i
 
 new dependencies: altogic cookies-next
+
+04/30
+
+https://github.com/trpc/examples-next-prisma-websockets-starter/blob/main/src/utils/trpc.ts
+
+adding websocket for docker
+
+https://nextjs.org/docs/api-reference/next.config.js/rewrites
+
+maybe rewires to include wsserver content to standaloen output?
+
+goback to youtube
+
+https://www.youtube.com/watch?v=YIJb27L4JkY&ab_channel=Deion
+
+5:01:30 use most of code from trpc starter github
+
+https://github.com/trpc/examples-next-prisma-websockets-starter/blob/main/src/utils/trpc.ts
